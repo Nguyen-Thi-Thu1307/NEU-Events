@@ -465,6 +465,10 @@ def export_attendance(event_id):
 @app.route('/organizer/events')
 @login_required
 def organizer_events():
+    if current_user.role not in ['ORGANIZER', 'MANAGER']:
+        flash('Bạn không có quyền truy cập trang quản lý của Ban tổ chức.', 'error')
+        return redirect(url_for('events'))
+
     edit_id = request.args.get('edit_id')
 
     # All events for unit
@@ -567,6 +571,10 @@ def cancel_event(event_id):
 @app.route('/moderation')
 @login_required
 def moderation():
+    if current_user.role != 'MANAGER':
+        flash('Bạn không có quyền truy cập phân hệ Kiểm duyệt sự kiện.', 'error')
+        return redirect(url_for('events'))
+
     pending = Event.query.filter_by(status='PENDING').order_by(Event.created_at.desc()).all()
     approved = Event.query.filter_by(status='APPROVED').order_by(Event.event_date.desc()).limit(10).all()
 
@@ -579,6 +587,10 @@ def moderation():
 @app.route('/moderation/approve/<int:event_id>', methods=['POST'])
 @login_required
 def approve_event(event_id):
+    if current_user.role != 'MANAGER':
+        flash('Bạn không có quyền thực hiện thao tác này.', 'error')
+        return redirect(url_for('events'))
+
     event = Event.query.get_or_404(event_id)
     event.status = 'APPROVED'
 
@@ -597,6 +609,10 @@ def approve_event(event_id):
 @app.route('/moderation/reject/<int:event_id>', methods=['POST'])
 @login_required
 def reject_event(event_id):
+    if current_user.role != 'MANAGER':
+        flash('Bạn không có quyền thực hiện thao tác này.', 'error')
+        return redirect(url_for('events'))
+
     event = Event.query.get_or_404(event_id)
     reason = request.form.get('reason', 'Nội dung cần bổ sung.')
 
