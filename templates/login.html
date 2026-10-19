@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - NEU Events</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neu: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            600: '#005bb5',
+                            700: '#0F4C81',
+                            800: '#0a365c',
+                            900: '#082a47',
+                            accent: '#e11d48'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="h-full flex overflow-hidden">
+
+    <!-- LEFT COLUMN: BRAND HERO BANNER -->
+    <div class="hidden lg:flex lg:w-1/2 relative bg-neu-900 text-white flex-col justify-between p-12 overflow-hidden">
+        <!-- BACKGROUND CAMPUS IMAGE WITH OVERLAY -->
+        <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&auto=format&fit=crop&q=80');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-neu-900 via-neu-800/90 to-neu-900/80"></div>
+
+        <!-- TOP LOGO -->
+        <div class="relative z-10 flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-white text-neu-700 font-black text-base flex items-center justify-center shadow-lg">
+                NEU
+            </div>
+            <div>
+                <div class="text-xl font-bold leading-tight tracking-wide">NEU Events</div>
+                <div class="text-xs uppercase font-medium text-slate-300 tracking-wider">ĐẠI HỌC KINH TẾ QUỐC DÂN</div>
+            </div>
+        </div>
+
+        <!-- MIDDLE SLOGAN & TITLE -->
+        <div class="relative z-10 space-y-6 max-w-lg my-auto">
+            <div class="flex items-center gap-2">
+                <span class="w-8 h-1 bg-rose-500 rounded-full inline-block"></span>
+                <span class="text-xs font-bold tracking-widest uppercase text-slate-200">KẾT NỐI • TRẢI NGHIỆM • TRƯỞNG THÀNH</span>
+            </div>
+            <h1 class="text-4xl xl:text-5xl font-black leading-tight tracking-tight">
+                Mỗi sự kiện,<br>một cơ hội mới.
+            </h1>
+            <p class="text-base text-slate-200 leading-relaxed font-light">
+                Khám phá hoạt động học thuật, kết nối doanh nghiệp và lan tỏa những giá trị tốt đẹp cùng cộng đồng NEU.
+            </p>
+
+            <!-- STATS ROW -->
+            <div class="grid grid-cols-3 gap-6 pt-6 border-t border-white/15">
+                <div>
+                    <div class="text-3xl font-extrabold text-white">120+</div>
+                    <div class="text-xs text-slate-300 mt-1">Sự kiện mỗi năm</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-extrabold text-white">15.000+</div>
+                    <div class="text-xs text-slate-300 mt-1">Lượt sinh viên tham gia</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-extrabold text-white">50+</div>
+                    <div class="text-xs text-slate-300 mt-1">Đơn vị đồng hành</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM ADDRESS -->
+        <div class="relative z-10 text-xs text-slate-400">
+            Đại học Kinh tế Quốc dân • 207 Giải Phóng, Hà Nội
+        </div>
+    </div>
+
+    <!-- RIGHT COLUMN: LOGIN FORM -->
+    <div class="w-full lg:w-1/2 flex flex-col justify-between p-8 sm:p-12 lg:p-16 bg-white overflow-y-auto">
+        <!-- TOP HELP -->
+        <div class="flex justify-end">
+            <button onclick="alert('Vui lòng liên hệ ban quản trị: events@neu.edu.vn hoặc phòng CNTT NEU để được cấp lại mật khẩu.')" class="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Trợ giúp đăng nhập</span>
+            </button>
+        </div>
+
+        <!-- FORM CONTAINER -->
+        <div class="max-w-md w-full mx-auto my-auto space-y-6">
+            <div>
+                <div class="text-xs font-bold text-neu-700 uppercase tracking-wider mb-2">CHÀO MỪNG ĐẾN VỚI NEU EVENTS</div>
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Đăng nhập</h2>
+                <p class="text-sm text-slate-500 mt-2">
+                    Sử dụng tài khoản của trường để đăng ký và quản lý các hoạt động của bạn.
+                </p>
+            </div>
+
+            <!-- FLASH MESSAGE -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="space-y-2">
+                    {% for category, message in messages %}
+                    <div class="p-3 rounded-lg text-xs font-medium {% if category == 'danger' or category == 'error' %}bg-rose-50 text-rose-700 border border-rose-200{% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('login') }}" class="space-y-4">
+                <!-- MSSV / EMAIL -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">MSSV hoặc email</label>
+                    <div class="relative">
+                        <input type="text" name="username" id="usernameInput" required value="11244035" placeholder="Nhập MSSV hoặc email NEU" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASSWORD -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Mật khẩu</label>
+                    <div class="relative">
+                        <input type="password" name="password" id="passwordInput" required value="123" placeholder="Nhập mật khẩu" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                            <i id="eyeIcon" class="fa-regular fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REMEMBER & FORGOT -->
+                <div class="flex items-center justify-between text-xs pt-1">
+                    <label class="flex items-center gap-2 text-slate-600 cursor-pointer">
+                        <input type="checkbox" name="remember" class="w-4 h-4 rounded text-neu-700 focus:ring-neu-700 border-slate-300">
+                        <span>Ghi nhớ đăng nhập</span>
+                    </label>
+                    <a href="#" onclick="alert('Liên hệ ban quản trị để đặt lại mật khẩu.')" class="font-semibold text-neu-700 hover:text-neu-800 transition">Quên mật khẩu?</a>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit" class="w-full py-3.5 bg-neu-700 hover:bg-neu-800 text-white font-semibold text-sm rounded-xl shadow-md flex items-center justify-center gap-2 transition transform active:scale-98">
+                    <span>Đăng nhập</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- DEMO LOGIN QUICK SWITCH PILLS -->
+            <div class="pt-2">
+                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">Tài khoản thử nghiệm nhanh:</div>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="fillLogin('11244035', '123')" class="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium text-center transition">
+                        🎓 Sinh viên
+                    </button>
+                    <button type="button" onclick="fillLogin('vieclam@neu.edu.vn', '123')" class="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium text-center transition">
+                        🏢 Ban tổ chức
+                    </button>
+                    <button type="button" onclick="fillLogin('quanly@neu.edu.vn', '123')" class="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium text-center transition">
+                        🛡️ Đơn vị QL
+                    </button>
+                </div>
+            </div>
+
+            <!-- NOTICE BOX -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+                <div class="font-bold text-slate-800">Một tài khoản, đúng không gian của bạn</div>
+                <p>Sinh viên, ban tổ chức và đơn vị quản lý được cấp quyền theo tài khoản NEU.</p>
+            </div>
+
+            <div class="text-center text-xs text-slate-400">
+                Không thể truy cập? Liên hệ <a href="mailto:events@neu.edu.vn" class="text-neu-700 font-semibold hover:underline">events@neu.edu.vn</a>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="text-center text-[11px] text-slate-400 pt-6">
+            <div>© 2026 Đại học Kinh tế Quốc dân</div>
+            <div class="flex items-center justify-center gap-4 mt-1">
+                <a href="#" class="hover:text-slate-600">Điều khoản sử dụng</a>
+                <span>•</span>
+                <a href="#" class="hover:text-slate-600">Chính sách bảo mật</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+
+        function fillLogin(username, password) {
+            document.getElementById('usernameInput').value = username;
+            document.getElementById('passwordInput').value = password;
+        }
+    </script>
+</body>
+</html>
