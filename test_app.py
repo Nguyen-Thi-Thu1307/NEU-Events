@@ -11,6 +11,12 @@ class NeuEventsTestCase(unittest.TestCase):
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
         self.client = app.test_client()
+        with app.app_context():
+            for username in ['11244035', '11240123', 'vieclam@neu.edu.vn', 'quanly@neu.edu.vn']:
+                u = User.query.filter((User.username == username) | (User.email == username)).first()
+                if u and not u.check_password('123'):
+                    u.set_password('123')
+            db.session.commit()
 
     def login(self, username, password):
         return self.client.post('/login', data={
@@ -152,6 +158,50 @@ class NeuEventsTestCase(unittest.TestCase):
         response = self.client.get('/feedback')
         self.assertEqual(response.status_code, 200)
         self.assertIn('Đánh giá sự kiện'.encode('utf-8'), response.data)
+        self.logout()
+
+    def test_11_manager_display_name(self):
+        """Test manager login displays 'Đơn vị quản lý' instead of previous department title"""
+        login_res = self.login('quanly@neu.edu.vn', '123')
+        self.assertEqual(login_res.status_code, 200)
+        self.assertIn('Đơn vị quản lý'.encode('utf-8'), login_res.data)
+        self.logout()
+
+    def test_12_change_password_flow(self):
+        """Test user changes password and can authenticate with new password"""
+        # Login as organizer
+        self.login('vieclam@neu.edu.vn', '123')
+
+        # Change password
+        chg_res = self.client.post('/change-password', data={
+            'old_password': '123',
+            'new_password': 'organizerNewPass2026',
+            'confirm_password': 'organizerNewPass2026'
+        }, follow_redirects=True)
+        self.assertEqual(chg_res.status_code, 200)
+        self.assertIn('Đổi mật khẩu thành công'.encode('utf-8'), chg_res.data)
+        self.logout()
+
+        # Re-login with new password
+        new_login = self.login('vieclam@neu.edu.vn', 'organizerNewPass2026')
+        self.assertEqual(new_login.status_code, 200)
+        self.logout()
+
+        # Restore password for future tests
+        self.login('vieclam@neu.edu.vn', 'organizerNewPass2026')
+        self.client.post('/change-password', data={
+            'old_password': 'organizerNewPass2026',
+            'new_password': '123',
+            'confirm_password': '123'
+        }, follow_redirects=True)
+        self.logout()
+
+    def test_13_switch_role_disabled(self):
+        """Test public role switcher is disabled"""
+        self.login('11244035', '123')
+        res = self.client.get('/switch-role/MANAGER', follow_redirects=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('vô hiệu hóa'.encode('utf-8'), res.data)
         self.logout()
 
 if __name__ == '__main__':

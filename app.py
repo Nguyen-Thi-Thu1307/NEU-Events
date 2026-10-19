@@ -94,7 +94,12 @@ def login():
             return render_template('login.html', login_id=login_id)
 
         login_user(user, remember=remember)
-        flash(f'Chào mừng {user.full_name} ({user.role}) đã đăng nhập thành công!', 'success')
+        if user.role == 'MANAGER':
+            flash('Chào mừng Đơn vị quản lý đã đăng nhập thành công!', 'success')
+        elif user.role == 'ORGANIZER':
+            flash(f'Chào mừng Ban tổ chức ({user.full_name}) đã đăng nhập thành công!', 'success')
+        else:
+            flash(f'Chào mừng sinh viên {user.full_name} đã đăng nhập thành công!', 'success')
         next_page = request.args.get('next')
         return redirect(next_page or url_for('events'))
 
@@ -162,27 +167,40 @@ def set_password():
 @login_required
 def logout():
     logout_user()
-    flash('Bạn đã đăng xuất an toàn.', 'info')
+    flash('Bạn đã đăng xuất an toàn khỏi hệ thống NEU Events.', 'info')
     return redirect(url_for('login'))
 
 @app.route('/switch-role/<role>')
 @login_required
 def switch_role(role):
-    """Quick role switcher for testing the app with different roles"""
-    if role not in ['STUDENT', 'ORGANIZER', 'MANAGER']:
-        role = 'STUDENT'
+    """Disable public role switching for security"""
+    flash('Chức năng chuyển đổi nhanh đã bị vô hiệu hóa vì lý do bảo mật. Vui lòng đăng nhập đúng tài khoản được cấp.', 'warning')
+    return redirect(request.referrer or url_for('events'))
 
-    # Find demo user for this role
-    if role == 'STUDENT':
-        target_user = User.query.filter_by(student_id='11244035').first()
-    elif role == 'ORGANIZER':
-        target_user = User.query.filter_by(email='vieclam@neu.edu.vn').first()
-    else:
-        target_user = User.query.filter_by(email='quanly@neu.edu.vn').first()
+@app.route('/change-password', methods=['POST'])
+@login_required
+def change_password():
+    """Allow Organizer, Manager, and Student to change their assigned password"""
+    old_password = request.form.get('old_password', '').strip()
+    new_password = request.form.get('new_password', '').strip()
+    confirm_password = request.form.get('confirm_password', '').strip()
 
-    if target_user:
-        login_user(target_user)
-        flash(f'Đã chuyển góc nhìn sang: {target_user.full_name} ({role})', 'info')
+    if not current_user.check_password(old_password):
+        flash('Mật khẩu hiện tại không chính xác. Vui lòng kiểm tra lại.', 'error')
+        return redirect(request.referrer or url_for('events'))
+
+    if len(new_password) < 6:
+        flash('Mật khẩu mới phải có tối thiểu 6 ký tự để đảm bảo bảo mật.', 'error')
+        return redirect(request.referrer or url_for('events'))
+
+    if new_password != confirm_password:
+        flash('Mật khẩu xác nhận không trùng khớp. Vui lòng nhập lại.', 'error')
+        return redirect(request.referrer or url_for('events'))
+
+    current_user.set_password(new_password)
+    db.session.commit()
+
+    flash('Đổi mật khẩu thành công! Mật khẩu mới đã được cập nhật.', 'success')
     return redirect(request.referrer or url_for('events'))
 
 # ----------------- 1. DISCOVERY & EVENT LIST -----------------

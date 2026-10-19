@@ -100,9 +100,9 @@ def seed_database(app):
         manager_admin = User(
             username='quanly@neu.edu.vn',
             email='quanly@neu.edu.vn',
-            full_name='Đơn vị Quản lý CTCT & QLSV',
+            full_name='Đơn vị Quản lý',
             role='MANAGER',
-            department='Phòng Công tác Chính trị & Quản lý Sinh viên',
+            department='Đơn vị Quản lý',
             phone='024 3628 0280',
             avatar_initials='QL'
         )
