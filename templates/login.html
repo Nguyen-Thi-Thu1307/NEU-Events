@@ -129,12 +129,16 @@
                 {% endif %}
             {% endwith %}
 
-            <form id="mainLoginForm" method="POST" action="{{ url_for('login') }}" class="space-y-4" onsubmit="return handleMainLoginSubmit(event)">
+            <form id="mainLoginForm" method="POST" action="{{ url_for('login') }}" class="space-y-4" onsubmit="return handleMainLoginSubmit(event)" autocomplete="off">
+                <!-- ANTI BROWSER AUTOFILL DUMMIES -->
+                <input type="text" name="fake_user" style="display:none" tabindex="-1" autocomplete="off">
+                <input type="password" name="fake_pass" style="display:none" tabindex="-1" autocomplete="off">
+
                 <!-- MSSV / EMAIL -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">Mã sinh viên (MSSV) hoặc email</label>
                     <div class="relative">
-                        <input type="text" name="username" id="usernameInput" required value="{{ login_id or '' }}" autocomplete="username" placeholder="Nhập MSSV (VD: 11244035) hoặc email NEU" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
+                        <input type="text" name="username" id="usernameInput" required value="{{ login_id or '' }}" autocomplete="off" placeholder="Nhập MSSV (VD: 11244035) hoặc email NEU" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-regular fa-user"></i>
                         </div>
@@ -145,7 +149,7 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">Mật khẩu</label>
                     <div class="relative">
-                        <input type="password" name="password" id="passwordInput" required autocomplete="current-password" placeholder="Nhập mật khẩu của bạn" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
+                        <input type="password" name="password" id="passwordInput" required autocomplete="new-password" value="" readonly onfocus="this.removeAttribute('readonly')" placeholder="Nhập mật khẩu của bạn" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
                         <button type="button" onclick="togglePassword('passwordInput', 'eyeIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                             <i id="eyeIcon" class="fa-regular fa-eye-slash"></i>
                         </button>
@@ -282,7 +286,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Mật khẩu mới tự chọn *</label>
                         <div class="relative">
-                            <input type="password" name="new_password" id="modalNewPassword" required minlength="6" placeholder="Tối thiểu 6 ký tự" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700">
+                            <input type="password" name="new_password" id="modalNewPassword" required minlength="6" autocomplete="new-password" placeholder="Tối thiểu 6 ký tự" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700">
                             <button type="button" onclick="togglePassword('modalNewPassword', 'modalEyeIcon1')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                                 <i id="modalEyeIcon1" class="fa-regular fa-eye-slash"></i>
                             </button>
@@ -292,7 +296,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Xác nhận lại mật khẩu *</label>
                         <div class="relative">
-                            <input type="password" name="confirm_password" id="modalConfirmPassword" required minlength="6" placeholder="Nhập lại mật khẩu mới" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700">
+                            <input type="password" name="confirm_password" id="modalConfirmPassword" required minlength="6" autocomplete="new-password" placeholder="Nhập lại mật khẩu mới" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700">
                             <button type="button" onclick="togglePassword('modalConfirmPassword', 'modalEyeIcon2')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                                 <i id="modalEyeIcon2" class="fa-regular fa-eye-slash"></i>
                             </button>
@@ -342,10 +346,20 @@
             }
         }
 
-        function fillMssv(mssv) {
-            document.getElementById('usernameInput').value = mssv;
-            document.getElementById('passwordInput').focus();
+        // Ensure password field stays strictly blank on page load and clear any delayed browser autofill
+        function ensurePasswordEmpty() {
+            const pwd = document.getElementById('passwordInput');
+            if (pwd) {
+                pwd.value = '';
+            }
         }
+        window.addEventListener('DOMContentLoaded', ensurePasswordEmpty);
+        window.addEventListener('pageshow', ensurePasswordEmpty);
+        window.addEventListener('load', function() {
+            ensurePasswordEmpty();
+            setTimeout(ensurePasswordEmpty, 80);
+            setTimeout(ensurePasswordEmpty, 250);
+        });
 
         // Handle Main Form Submission & Check Remember Preference
         function handleMainLoginSubmit(e) {

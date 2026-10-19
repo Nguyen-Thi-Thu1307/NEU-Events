@@ -90,7 +90,10 @@ def login():
             return render_template('login.html', login_id=login_id)
 
         if not user.check_password(password):
-            flash('Mật khẩu không chính xác. Sinh viên có thể sử dụng chức năng "Kích hoạt / Đặt lại mật khẩu" bên dưới để tự thiết lập mật khẩu.', 'error')
+            if user.role == 'STUDENT' and not getattr(user, 'is_password_set', False):
+                flash('Mã sinh viên này chưa thiết lập mật khẩu cá nhân. Vui lòng bấm "Tự đặt mật khẩu" bên dưới để kích hoạt tài khoản của bạn.', 'warning')
+            else:
+                flash('Mật khẩu không chính xác. Sinh viên có thể sử dụng chức năng "Tự đặt mật khẩu" bên dưới để kích hoạt hoặc đặt lại mật khẩu.', 'error')
             return render_template('login.html', login_id=login_id)
 
         login_user(user, remember=remember)

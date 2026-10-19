@@ -79,6 +79,18 @@ class NeuEventsTestCase(unittest.TestCase):
         self.assertIn('Nguyễn Minh Anh'.encode('utf-8'), login_res.data)
         self.logout()
 
+    def test_02e_unset_student_cannot_login_with_default_password(self):
+        """Test student without a self-set password cannot log in with default credentials"""
+        with app.app_context():
+            u = User.query.filter_by(student_id='11240218').first()
+            if u:
+                u.is_password_set = False
+                db.session.commit()
+
+        res = self.login('11240218', '123')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('chưa thiết lập mật khẩu cá nhân'.encode('utf-8'), res.data)
+
     def test_03_event_discovery_page(self):
         """Test event listing and keyword search"""
         self.login('11244035', '123')

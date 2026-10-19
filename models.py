@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
     student_id = db.Column(db.String(20), nullable=True) # MSSV
     phone = db.Column(db.String(20), nullable=True)
     avatar_initials = db.Column(db.String(5), default='NEU')
+    is_password_set = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -30,8 +31,13 @@ class User(UserMixin, db.Model):
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+        self.is_password_set = True
 
     def check_password(self, password):
+        if not self.password_hash or self.password_hash.startswith('!UNSET_'):
+            return False
+        if self.role == 'STUDENT' and not getattr(self, 'is_password_set', False):
+            return False
         return check_password_hash(self.password_hash, password)
 
 

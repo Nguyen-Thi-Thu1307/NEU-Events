@@ -24,7 +24,6 @@ def seed_database(app):
             phone='0987123456',
             avatar_initials='MA'
         )
-        student_thu.set_password('123')
 
         student_anh = User(
             username='11240123',
@@ -36,7 +35,6 @@ def seed_database(app):
             phone='0912345678',
             avatar_initials='MA'
         )
-        student_anh.set_password('123')
 
         student_huy = User(
             username='11240218',
@@ -48,7 +46,6 @@ def seed_database(app):
             phone='0934567890',
             avatar_initials='DH'
         )
-        student_huy.set_password('123')
 
         student_linh = User(
             username='11240086',
@@ -60,7 +57,6 @@ def seed_database(app):
             phone='0945678901',
             avatar_initials='PL'
         )
-        student_linh.set_password('123')
 
         student_an = User(
             username='11240305',
@@ -72,7 +68,6 @@ def seed_database(app):
             phone='0956789012',
             avatar_initials='KA'
         )
-        student_an.set_password('123')
 
         student_nam = User(
             username='11240172',
@@ -84,7 +79,10 @@ def seed_database(app):
             phone='0967890123',
             avatar_initials='HN'
         )
-        student_nam.set_password('123')
+        # Students have no default password - they self-set their own password using MSSV verification
+        for s in [student_thu, student_anh, student_huy, student_linh, student_an, student_nam]:
+            s.password_hash = '!UNSET_NO_DEFAULT_PASSWORD!'
+            s.is_password_set = False
 
         organizer_thu = User(
             username='vieclam@neu.edu.vn',
@@ -96,6 +94,7 @@ def seed_database(app):
             avatar_initials='HT'
         )
         organizer_thu.set_password('123')
+        organizer_thu.is_password_set = True
 
         manager_admin = User(
             username='quanly@neu.edu.vn',
@@ -107,6 +106,7 @@ def seed_database(app):
             avatar_initials='QL'
         )
         manager_admin.set_password('123')
+        manager_admin.is_password_set = True
 
         db.session.add_all([student_thu, student_anh, student_huy, student_linh, student_an, student_nam, organizer_thu, manager_admin])
         db.session.commit()

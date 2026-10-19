@@ -25,15 +25,15 @@ Hệ thống web toàn diện phục vụ công tác tổ chức, quản lý và
 
 ---
 
-## 👥 2. Tài khoản Demo trải nghiệm (Mật khẩu mặc định: `123`)
+## 👥 2. Tài khoản Trải nghiệm Hệ thống
 
-| Phân quyền (Role) | Mã đăng nhập / Email | Họ tên đại diện | Đơn vị / Chức vụ |
+| Phân quyền (Role) | Mã đăng nhập / Email | Họ tên đại diện | Cơ chế xác thực |
 | :--- | :--- | :--- | :--- |
-| **Sinh viên (`STUDENT`)** | `11244035` | Nguyễn Hoàng Long | Viện CNTT & Kinh tế số |
-| **Ban tổ chức (`ORGANIZER`)** | `vieclam@neu.edu.vn` | TS. Trần Văn Minh | Trung tâm TV Hướng nghiệp & Việc làm |
-| **Quản lý (`MANAGER`)** | `quanly@neu.edu.vn` | ThS. Lê Quang Đạo | Phòng CTCT & Quản lý Sinh viên |
+| **Sinh viên (`STUDENT`)** | `11244035` (hoặc MSSV NEU) | Nguyễn Thị Thu | Xác thực MSSV NEU, **tự đặt mật khẩu riêng** tại nút *"Tự đặt mật khẩu"* |
+| **Ban tổ chức (`ORGANIZER`)** | `vieclam@neu.edu.vn` | Trần Hoài Thu | Cung cấp tài khoản riêng, đổi mật khẩu linh hoạt |
+| **Đơn vị quản lý (`MANAGER`)** | `quanly@neu.edu.vn` | Đơn vị Quản lý | Cung cấp tài khoản riêng, đổi mật khẩu linh hoạt |
 
-> **Mẹo**: Trong thanh điều hướng (Navbar) có menu **"Đổi vai trò"** giúp bạn chuyển đổi nhanh giữa 3 phân quyền mà không cần đăng xuất.
+> **Lưu ý bảo mật**: Hệ thống không lưu mật khẩu mặc định sẵn. Sinh viên sử dụng MSSV để tự kích hoạt mật khẩu; Cán bộ quản trị và ban tổ chức có thể đổi mật khẩu qua menu tài khoản.
 
 ---
 
