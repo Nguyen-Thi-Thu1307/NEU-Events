@@ -69,6 +69,7 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('events'))
 
+    login_id = ''
     if request.method == 'POST':
         login_id = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
@@ -81,15 +82,81 @@ def login():
             (User.student_id == login_id)
         ).first()
 
-        if user and user.check_password(password):
-            login_user(user, remember=remember)
-            flash(f'Chào mừng {user.full_name} ({user.role}) đã đăng nhập thành công!', 'success')
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('events'))
-        else:
-            flash('Mã sinh viên/Email hoặc mật khẩu không chính xác. Mẹo: Mật khẩu mặc định là 123.', 'error')
+        if not user:
+            if login_id.isdigit():
+                flash(f'Mã sinh viên "{login_id}" không tồn tại trong danh sách sinh viên Đại học Kinh tế Quốc dân. Vui lòng kiểm tra lại chính xác MSSV.', 'error')
+            else:
+                flash(f'Tài khoản "{login_id}" không tồn tại trong hệ thống NEU Events.', 'error')
+            return render_template('login.html', login_id=login_id)
 
-    return render_template('login.html')
+        if not user.check_password(password):
+            flash('Mật khẩu không chính xác. Sinh viên có thể sử dụng chức năng "Kích hoạt / Đặt lại mật khẩu" bên dưới để tự thiết lập mật khẩu.', 'error')
+            return render_template('login.html', login_id=login_id)
+
+        login_user(user, remember=remember)
+        flash(f'Chào mừng {user.full_name} ({user.role}) đã đăng nhập thành công!', 'success')
+        next_page = request.args.get('next')
+        return redirect(next_page or url_for('events'))
+
+    return render_template('login.html', login_id=login_id)
+
+@app.route('/api/check-student', methods=['GET'])
+def check_student():
+    """Verify if MSSV belongs to an active NEU student"""
+    student_id = request.args.get('student_id', '').strip()
+    if not student_id:
+        return jsonify({'exists': False, 'message': 'Vui lòng cung cấp mã sinh viên.'})
+
+    user = User.query.filter(
+        (User.student_id == student_id) |
+        (User.username == student_id)
+    ).first()
+
+    if user and user.role == 'STUDENT':
+        return jsonify({
+            'exists': True,
+            'full_name': user.full_name,
+            'department': user.department or 'Đại học Kinh tế Quốc dân',
+            'student_id': user.student_id or user.username,
+            'email': user.email
+        })
+    else:
+        return jsonify({
+            'exists': False,
+            'message': f'Mã sinh viên "{student_id}" không tồn tại trong danh sách sinh viên Đại học Kinh tế Quốc dân.'
+        })
+
+@app.route('/set-password', methods=['POST'])
+def set_password():
+    """Allow NEU students to set/reset their own password without Microsoft SSO integration"""
+    student_id = request.form.get('student_id', '').strip()
+    new_password = request.form.get('new_password', '').strip()
+    confirm_password = request.form.get('confirm_password', '').strip()
+    remember = bool(request.form.get('remember'))
+
+    user = User.query.filter(
+        (User.student_id == student_id) |
+        (User.username == student_id)
+    ).first()
+
+    if not user or user.role != 'STUDENT':
+        flash('Mã sinh viên không hợp lệ hoặc không thuộc danh sách sinh viên NEU.', 'error')
+        return redirect(url_for('login'))
+
+    if len(new_password) < 6:
+        flash('Mật khẩu phải có độ dài tối thiểu 6 ký tự để bảo mật tài khoản.', 'error')
+        return redirect(url_for('login'))
+
+    if new_password != confirm_password:
+        flash('Mật khẩu xác nhận không khớp. Vui lòng nhập lại chính xác.', 'error')
+        return redirect(url_for('login'))
+
+    user.set_password(new_password)
+    db.session.commit()
+
+    login_user(user, remember=remember)
+    flash(f'Thiết lập mật khẩu thành công! Chào mừng sinh viên {user.full_name} ({user.student_id}).', 'success')
+    return redirect(url_for('events'))
 
 @app.route('/logout')
 @login_required

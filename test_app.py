@@ -34,6 +34,45 @@ class NeuEventsTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('không chính xác'.encode('utf-8'), response.data)
 
+    def test_02b_login_invalid_mssv(self):
+        """Test login fails when MSSV is not in NEU student registry"""
+        response = self.login('99999999', 'anypassword')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('không tồn tại trong danh sách sinh viên Đại học Kinh tế Quốc dân'.encode('utf-8'), response.data)
+
+    def test_02c_check_student_api(self):
+        """Test API validating active NEU student ID"""
+        # Valid MSSV
+        res_valid = self.client.get('/api/check-student?student_id=11244035')
+        self.assertEqual(res_valid.status_code, 200)
+        data_valid = res_valid.get_json()
+        self.assertTrue(data_valid['exists'])
+        self.assertEqual(data_valid['full_name'], 'Nguyễn Thị Thu')
+
+        # Invalid MSSV
+        res_invalid = self.client.get('/api/check-student?student_id=88888888')
+        self.assertEqual(res_invalid.status_code, 200)
+        data_invalid = res_invalid.get_json()
+        self.assertFalse(data_invalid['exists'])
+
+    def test_02d_student_set_password(self):
+        """Test student self-setting password and logging in"""
+        res = self.client.post('/set-password', data={
+            'student_id': '11240123',
+            'new_password': 'mypassword2026',
+            'confirm_password': 'mypassword2026',
+            'remember': 'true'
+        }, follow_redirects=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('Nguyễn Minh Anh'.encode('utf-8'), res.data)
+        self.logout()
+
+        # Re-login with the newly set password
+        login_res = self.login('11240123', 'mypassword2026')
+        self.assertEqual(login_res.status_code, 200)
+        self.assertIn('Nguyễn Minh Anh'.encode('utf-8'), login_res.data)
+        self.logout()
+
     def test_03_event_discovery_page(self):
         """Test event listing and keyword search"""
         self.login('11244035', '123')

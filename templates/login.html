@@ -99,9 +99,9 @@
     <div class="w-full lg:w-1/2 flex flex-col justify-between p-8 sm:p-12 lg:p-16 bg-white overflow-y-auto">
         <!-- TOP HELP -->
         <div class="flex justify-end">
-            <button onclick="alert('Vui lòng liên hệ ban quản trị: events@neu.edu.vn hoặc phòng CNTT NEU để được cấp lại mật khẩu.')" class="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition">
+            <button onclick="alert('Vui lòng liên hệ ban quản trị: events@neu.edu.vn hoặc Phòng QLSV NEU để được hỗ trợ tài khoản.')" class="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition">
                 <i class="fa-regular fa-circle-question"></i>
-                <span>Trợ giúp đăng nhập</span>
+                <span>Trợ giúp sinh viên</span>
             </button>
         </div>
 
@@ -111,7 +111,7 @@
                 <div class="text-xs font-bold text-neu-700 uppercase tracking-wider mb-2">CHÀO MỪNG ĐẾN VỚI NEU EVENTS</div>
                 <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Đăng nhập</h2>
                 <p class="text-sm text-slate-500 mt-2">
-                    Sử dụng tài khoản của trường để đăng ký và quản lý các hoạt động của bạn.
+                    Sử dụng Mã sinh viên (MSSV) hoặc email cán bộ NEU để đăng nhập vào cổng sự kiện.
                 </p>
             </div>
 
@@ -120,20 +120,21 @@
                 {% if messages %}
                 <div class="space-y-2">
                     {% for category, message in messages %}
-                    <div class="p-3 rounded-lg text-xs font-medium {% if category == 'danger' or category == 'error' %}bg-rose-50 text-rose-700 border border-rose-200{% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}">
-                        {{ message }}
+                    <div class="p-3.5 rounded-xl text-xs font-medium flex items-start gap-2.5 {% if category == 'danger' or category == 'error' %}bg-rose-50 text-rose-700 border border-rose-200{% else %}bg-emerald-50 text-emerald-800 border border-emerald-200{% endif %}">
+                        <i class="fa-solid {% if category == 'danger' or category == 'error' %}fa-circle-exclamation text-rose-500{% else %}fa-circle-check text-emerald-600{% endif %} mt-0.5"></i>
+                        <span>{{ message }}</span>
                     </div>
                     {% endfor %}
                 </div>
                 {% endif %}
             {% endwith %}
 
-            <form method="POST" action="{{ url_for('login') }}" class="space-y-4">
+            <form id="mainLoginForm" method="POST" action="{{ url_for('login') }}" class="space-y-4" onsubmit="return handleMainLoginSubmit(event)">
                 <!-- MSSV / EMAIL -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">MSSV hoặc email</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Mã sinh viên (MSSV) hoặc email</label>
                     <div class="relative">
-                        <input type="text" name="username" id="usernameInput" required value="11244035" placeholder="Nhập MSSV hoặc email NEU" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
+                        <input type="text" name="username" id="usernameInput" required value="{{ login_id or '' }}" autocomplete="username" placeholder="Nhập MSSV (VD: 11244035) hoặc email NEU" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-regular fa-user"></i>
                         </div>
@@ -144,8 +145,8 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">Mật khẩu</label>
                     <div class="relative">
-                        <input type="password" name="password" id="passwordInput" required value="123" placeholder="Nhập mật khẩu" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
-                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                        <input type="password" name="password" id="passwordInput" required autocomplete="current-password" placeholder="Nhập mật khẩu của bạn" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700 focus:border-transparent transition">
+                        <button type="button" onclick="togglePassword('passwordInput', 'eyeIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
                             <i id="eyeIcon" class="fa-regular fa-eye-slash"></i>
                         </button>
                     </div>
@@ -153,40 +154,75 @@
 
                 <!-- REMEMBER & FORGOT -->
                 <div class="flex items-center justify-between text-xs pt-1">
-                    <label class="flex items-center gap-2 text-slate-600 cursor-pointer">
-                        <input type="checkbox" name="remember" class="w-4 h-4 rounded text-neu-700 focus:ring-neu-700 border-slate-300">
+                    <label class="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
+                        <input type="checkbox" name="remember" id="rememberCheckbox" class="w-4 h-4 rounded text-neu-700 focus:ring-neu-700 border-slate-300">
                         <span>Ghi nhớ đăng nhập</span>
                     </label>
-                    <a href="#" onclick="alert('Liên hệ ban quản trị để đặt lại mật khẩu.')" class="font-semibold text-neu-700 hover:text-neu-800 transition">Quên mật khẩu?</a>
+                    <button type="button" onclick="openSetPasswordModal(true)" class="font-semibold text-neu-700 hover:text-neu-800 transition">
+                        Quên mật khẩu?
+                    </button>
                 </div>
 
                 <!-- SUBMIT BUTTON -->
-                <button type="submit" class="w-full py-3.5 bg-neu-700 hover:bg-neu-800 text-white font-semibold text-sm rounded-xl shadow-md flex items-center justify-center gap-2 transition transform active:scale-98">
+                <button type="submit" id="mainSubmitBtn" class="w-full py-3.5 bg-neu-700 hover:bg-neu-800 text-white font-semibold text-sm rounded-xl shadow-md flex items-center justify-center gap-2 transition transform active:scale-98">
                     <span>Đăng nhập</span>
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </form>
 
-            <!-- DEMO LOGIN QUICK SWITCH PILLS -->
-            <div class="pt-2">
-                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">Tài khoản thử nghiệm nhanh:</div>
-                <div class="grid grid-cols-3 gap-2">
-                    <button type="button" onclick="fillLogin('11244035', '123')" class="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium text-center transition">
-                        🎓 Sinh viên
-                    </button>
-                    <button type="button" onclick="fillLogin('vieclam@neu.edu.vn', '123')" class="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium text-center transition">
-                        🏢 Ban tổ chức
-                    </button>
-                    <button type="button" onclick="fillLogin('quanly@neu.edu.vn', '123')" class="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium text-center transition">
-                        🛡️ Đơn vị QL
-                    </button>
+            <!-- STUDENT SELF-SET PASSWORD BANNER -->
+            <div class="p-4 bg-gradient-to-r from-blue-50/90 to-neu-50/70 border border-blue-200/80 rounded-2xl flex items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-3 text-blue-900">
+                    <div class="w-9 h-9 rounded-xl bg-white border border-blue-200 text-neu-700 flex items-center justify-center shrink-0 text-base shadow-2xs">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-900">Lần đầu đăng nhập hoặc chưa có mật khẩu?</div>
+                        <div class="text-[11px] text-slate-500">Xác thực bằng MSSV NEU và tự đặt mật khẩu riêng</div>
+                    </div>
                 </div>
+                <button type="button" onclick="openSetPasswordModal(false)" class="px-3.5 py-2 bg-neu-700 hover:bg-neu-800 text-white rounded-xl font-bold text-xs transition shrink-0 shadow-xs">
+                    Tự đặt mật khẩu
+                </button>
             </div>
 
             <!-- NOTICE BOX -->
             <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
                 <div class="font-bold text-slate-800">Một tài khoản, đúng không gian của bạn</div>
                 <p>Sinh viên, ban tổ chức và đơn vị quản lý được cấp quyền theo tài khoản NEU.</p>
+            </div>
+
+            <!-- SAMPLE MSSV LOOKUP ACCORDION (SUBTLE HELPER) -->
+            <div class="pt-1 text-center">
+                <button type="button" onclick="document.getElementById('demoMssvDrawer').classList.toggle('hidden')" class="text-[11px] text-slate-400 hover:text-slate-600 transition inline-flex items-center gap-1.5 mx-auto">
+                    <i class="fa-regular fa-address-card"></i>
+                    <span>Xem một số MSSV sinh viên NEU mẫu</span>
+                    <i class="fa-solid fa-chevron-down text-[9px]"></i>
+                </button>
+                <div id="demoMssvDrawer" class="hidden mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left text-xs space-y-2">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase">Bấm để điền nhanh MSSV:</div>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button type="button" onclick="fillMssv('11244035')" class="p-1.5 bg-white border border-slate-200 rounded-lg text-left hover:border-neu-700 hover:bg-blue-50 transition">
+                            <div class="font-mono font-bold text-slate-800">11244035</div>
+                            <div class="text-[10px] text-slate-500 truncate">Nguyễn Thị Thu (CNTT)</div>
+                        </button>
+                        <button type="button" onclick="fillMssv('11240123')" class="p-1.5 bg-white border border-slate-200 rounded-lg text-left hover:border-neu-700 hover:bg-blue-50 transition">
+                            <div class="font-mono font-bold text-slate-800">11240123</div>
+                            <div class="text-[10px] text-slate-500 truncate">Nguyễn Minh Anh (MKT)</div>
+                        </button>
+                        <button type="button" onclick="fillMssv('11240218')" class="p-1.5 bg-white border border-slate-200 rounded-lg text-left hover:border-neu-700 hover:bg-blue-50 transition">
+                            <div class="font-mono font-bold text-slate-800">11240218</div>
+                            <div class="text-[10px] text-slate-500 truncate">Trần Đức Huy (TCNH)</div>
+                        </button>
+                        <button type="button" onclick="fillMssv('11240086')" class="p-1.5 bg-white border border-slate-200 rounded-lg text-left hover:border-neu-700 hover:bg-blue-50 transition">
+                            <div class="font-mono font-bold text-slate-800">11240086</div>
+                            <div class="text-[10px] text-slate-500 truncate">Lê Phương Linh (QTKD)</div>
+                        </button>
+                    </div>
+                    <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-200/60">
+                        Cán bộ: <code>vieclam@neu.edu.vn</code> (Ban tổ chức), <code>quanly@neu.edu.vn</code> (Quản lý)
+                    </div>
+                </div>
             </div>
 
             <div class="text-center text-xs text-slate-400">
@@ -205,10 +241,129 @@
         </div>
     </div>
 
+    <!-- MODAL 1: CONFIRM SAVE LOGIN CHOICE ("HỆ THỐNG HỎI CÓ MUỐN LƯU KHÔNG") -->
+    <div id="saveLoginConfirmModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-5 shadow-2xl border border-slate-100">
+            <div class="w-14 h-14 bg-neu-50 text-neu-700 rounded-2xl flex items-center justify-center mx-auto text-2xl border border-neu-100 shadow-xs">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-base font-bold text-slate-900">Lưu thông tin đăng nhập?</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Bạn có muốn duy trì trạng thái đăng nhập cho các lần truy cập tiếp theo trên thiết bị này không?
+                </p>
+            </div>
+            <div class="space-y-2.5">
+                <button type="button" onclick="confirmLoginWithChoice(true)" class="w-full py-3 px-4 bg-neu-700 hover:bg-neu-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs">
+                    <i class="fa-solid fa-laptop"></i>
+                    <span>Có, lưu đăng nhập (Thiết bị cá nhân)</span>
+                </button>
+                <button type="button" onclick="confirmLoginWithChoice(false)" class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-desktop"></i>
+                    <span>Không lưu (Máy tính dùng chung / Thư viện)</span>
+                </button>
+            </div>
+            <button type="button" onclick="closeSaveLoginModal()" class="text-xs text-slate-400 hover:text-slate-600 font-medium">
+                Quay lại
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: STUDENT SELF-SET PASSWORD -->
+    <div id="setPasswordModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-neu-50 text-neu-700 flex items-center justify-center text-lg border border-neu-100">
+                        <i class="fa-solid fa-user-lock"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900" id="setPasswordModalTitle">Thiết lập mật khẩu sinh viên</h3>
+                        <p class="text-xs text-slate-400">Dành riêng cho sinh viên Đại học Kinh tế Quốc dân</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeSetPasswordModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ url_for('set_password') }}" id="setPasswordForm" class="space-y-4">
+                <!-- STEP 1: MSSV INPUT & VERIFY -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Mã sinh viên (MSSV) *</label>
+                    <div class="flex gap-2">
+                        <input type="text" name="student_id" id="modalStudentId" required placeholder="Ví dụ: 11244035" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-neu-700">
+                        <button type="button" onclick="verifyStudentMssv()" id="btnVerifyMssv" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition shrink-0">
+                            Kiểm tra
+                        </button>
+                    </div>
+                    <div id="mssvFeedback" class="text-[11px] mt-1.5 hidden"></div>
+                </div>
+
+                <!-- VERIFIED STUDENT BADGE -->
+                <div id="verifiedStudentCard" class="hidden p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs space-y-1">
+                    <div class="flex items-center gap-1.5 font-bold text-emerald-900">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                        <span>Xác thực thành công sinh viên NEU</span>
+                    </div>
+                    <div class="text-slate-800 font-bold" id="cardFullName"></div>
+                    <div class="text-slate-500 text-[11px]" id="cardDept"></div>
+                </div>
+
+                <!-- STEP 2: ENTER NEW PASSWORD -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Mật khẩu mới tự chọn *</label>
+                        <div class="relative">
+                            <input type="password" name="new_password" id="modalNewPassword" required minlength="6" placeholder="Tối thiểu 6 ký tự" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700">
+                            <button type="button" onclick="togglePassword('modalNewPassword', 'modalEyeIcon1')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                                <i id="modalEyeIcon1" class="fa-regular fa-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Xác nhận lại mật khẩu *</label>
+                        <div class="relative">
+                            <input type="password" name="confirm_password" id="modalConfirmPassword" required minlength="6" placeholder="Nhập lại mật khẩu mới" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-neu-700">
+                            <button type="button" onclick="togglePassword('modalConfirmPassword', 'modalEyeIcon2')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                                <i id="modalEyeIcon2" class="fa-regular fa-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: REMEMBER CHECKBOX -->
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer select-none">
+                        <input type="checkbox" name="remember" id="modalRememberCheckbox" checked class="w-4 h-4 rounded text-neu-700 focus:ring-neu-700 border-slate-300">
+                        <div>
+                            <span class="font-semibold">Lưu mật khẩu trên thiết bị này</span>
+                            <div class="text-[11px] text-slate-400">Bỏ chọn nếu bạn đang dùng máy tính công cộng</div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <div class="flex items-center justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeSetPasswordModal()" class="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 transition">
+                        Hủy
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 bg-neu-700 hover:bg-neu-800 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-2">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Lưu mật khẩu & Đăng nhập</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        function togglePassword() {
-            const input = document.getElementById('passwordInput');
-            const icon = document.getElementById('eyeIcon');
+        let pendingFormToSubmit = null;
+
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.classList.remove('fa-eye-slash');
@@ -220,10 +375,108 @@
             }
         }
 
-        function fillLogin(username, password) {
-            document.getElementById('usernameInput').value = username;
-            document.getElementById('passwordInput').value = password;
+        function fillMssv(mssv) {
+            document.getElementById('usernameInput').value = mssv;
+            document.getElementById('passwordInput').focus();
         }
+
+        // Handle Main Form Submission & Check Remember Preference
+        function handleMainLoginSubmit(e) {
+            const rememberChecked = document.getElementById('rememberCheckbox').checked;
+            // If the user already ticked remember, submit directly
+            if (rememberChecked) {
+                return true;
+            }
+
+            // Otherwise, prompt user asking if they want to remember on this device
+            e.preventDefault();
+            pendingFormToSubmit = document.getElementById('mainLoginForm');
+            document.getElementById('saveLoginConfirmModal').classList.remove('hidden');
+            return false;
+        }
+
+        function confirmLoginWithChoice(saveChoice) {
+            if (pendingFormToSubmit) {
+                const rem = pendingFormToSubmit.querySelector('input[name="remember"]');
+                if (rem) {
+                    rem.checked = saveChoice;
+                }
+                document.getElementById('saveLoginConfirmModal').classList.add('hidden');
+                pendingFormToSubmit.submit();
+            }
+        }
+
+        function closeSaveLoginModal() {
+            document.getElementById('saveLoginConfirmModal').classList.add('hidden');
+            pendingFormToSubmit = null;
+        }
+
+        // Set Password Modal Logic
+        function openSetPasswordModal(isReset = false) {
+            document.getElementById('setPasswordModal').classList.remove('hidden');
+            const currentMssv = document.getElementById('usernameInput').value.trim();
+            if (currentMssv) {
+                document.getElementById('modalStudentId').value = currentMssv;
+                verifyStudentMssv();
+            }
+            if (isReset) {
+                document.getElementById('setPasswordModalTitle').innerText = 'Đặt lại mật khẩu sinh viên';
+            } else {
+                document.getElementById('setPasswordModalTitle').innerText = 'Thiết lập mật khẩu sinh viên';
+            }
+        }
+
+        function closeSetPasswordModal() {
+            document.getElementById('setPasswordModal').classList.add('hidden');
+            document.getElementById('mssvFeedback').classList.add('hidden');
+            document.getElementById('verifiedStudentCard').classList.add('hidden');
+        }
+
+        async function verifyStudentMssv() {
+            const studentId = document.getElementById('modalStudentId').value.trim();
+            const feedback = document.getElementById('mssvFeedback');
+            const verifiedCard = document.getElementById('verifiedStudentCard');
+            const btn = document.getElementById('btnVerifyMssv');
+
+            if (!studentId) {
+                feedback.className = 'text-[11px] mt-1.5 text-rose-600 block';
+                feedback.innerText = 'Vui lòng nhập Mã sinh viên.';
+                verifiedCard.classList.add('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Đang kiểm tra...';
+
+            try {
+                const res = await fetch('/api/check-student?student_id=' + encodeURIComponent(studentId));
+                const data = await res.json();
+
+                if (data.exists) {
+                    feedback.className = 'text-[11px] mt-1.5 text-emerald-600 hidden';
+                    verifiedCard.classList.remove('hidden');
+                    document.getElementById('cardFullName').innerText = data.full_name + ' • MSSV: ' + data.student_id;
+                    document.getElementById('cardDept').innerText = data.department + ' • ' + data.email;
+                } else {
+                    verifiedCard.classList.add('hidden');
+                    feedback.className = 'text-[11px] mt-1.5 text-rose-600 block font-medium';
+                    feedback.innerText = data.message;
+                }
+            } catch (err) {
+                feedback.className = 'text-[11px] mt-1.5 text-amber-600 block';
+                feedback.innerText = 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Kiểm tra';
+            }
+        }
+
+        // Auto verify on input change if length looks like MSSV (8 digits)
+        document.getElementById('modalStudentId').addEventListener('input', function(e) {
+            if (e.target.value.trim().length === 8 && /^\d+$/.test(e.target.value.trim())) {
+                verifyStudentMssv();
+            }
+        });
     </script>
 </body>
 </html>
