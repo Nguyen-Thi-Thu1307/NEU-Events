@@ -286,16 +286,23 @@
 </div>
 
 <!-- QR SCAN MODAL -->
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <div id="qrModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
         <h3 class="text-base font-bold text-slate-900">Quét mã QR điểm danh</h3>
         <p class="text-xs text-slate-500">Hướng camera về phía mã QR trên màn chiếu hội trường.</p>
-        <div class="w-56 h-56 mx-auto bg-slate-900 rounded-2xl relative overflow-hidden flex items-center justify-center">
+        
+        <!-- Live Camera Stream Viewport -->
+        <div id="qr-reader" class="w-full max-w-xs mx-auto overflow-hidden rounded-2xl hidden border border-slate-200"></div>
+
+        <!-- Animated Scanner Placeholder -->
+        <div id="qrPlaceholder" class="w-56 h-56 mx-auto bg-slate-900 rounded-2xl relative overflow-hidden flex items-center justify-center">
             <div class="w-44 h-44 border-2 border-dashed border-emerald-400 rounded-xl flex items-center justify-center animate-pulse">
                 <i class="fa-solid fa-qrcode text-6xl text-white/50"></i>
             </div>
             <div class="absolute inset-x-0 h-0.5 bg-emerald-400 shadow-lg shadow-emerald-400 top-1/2 animate-bounce"></div>
         </div>
+
         <form method="POST" action="{{ url_for('submit_checkin') }}">
             <input type="hidden" name="event_id" value="{{ active_event.id }}">
             <input type="hidden" name="pin" value="{{ active_session.session_pin if active_session else 'AI1210' }}">
@@ -303,15 +310,52 @@
                 Mô phỏng Quét thành công (Mã {{ active_session.session_pin if active_session else 'AI1210' }})
             </button>
         </form>
-        <button type="button" onclick="document.getElementById('qrModal').classList.add('hidden')" class="w-full py-2 text-slate-500 text-xs font-semibold hover:text-slate-800">
+        <button type="button" onclick="closeQrModal()" class="w-full py-2 text-slate-500 text-xs font-semibold hover:text-slate-800">
             Hủy
         </button>
     </div>
 </div>
 
 <script>
+    let html5QrScanner = null;
+
     function openQrModal() {
         document.getElementById('qrModal').classList.remove('hidden');
+        if (typeof Html5Qrcode !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            try {
+                if (!html5QrScanner) {
+                    html5QrScanner = new Html5Qrcode("qr-reader");
+                }
+                document.getElementById('qr-reader').classList.remove('hidden');
+                document.getElementById('qrPlaceholder').classList.add('hidden');
+                html5QrScanner.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 200, height: 200 } },
+                    (decodedText) => {
+                        let pin = decodedText.trim();
+                        if (pin.includes(':')) pin = pin.split(':').pop();
+                        const pinInputs = document.querySelectorAll('input[name="pin"]');
+                        pinInputs.forEach(i => i.value = pin);
+                        closeQrModal();
+                        document.querySelector('form[action*="checkin/submit"]').submit();
+                    },
+                    (error) => {}
+                ).catch(err => {
+                    console.log("Camera access not granted or not supported:", err);
+                    document.getElementById('qr-reader').classList.add('hidden');
+                    document.getElementById('qrPlaceholder').classList.remove('hidden');
+                });
+            } catch(e) {
+                console.log(e);
+            }
+        }
+    }
+
+    function closeQrModal() {
+        document.getElementById('qrModal').classList.add('hidden');
+        if (html5QrScanner && html5QrScanner.isScanning) {
+            html5QrScanner.stop().catch(console.error);
+        }
     }
 
     function filterAttendees() {
