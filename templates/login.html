@@ -33,55 +33,65 @@
 <body class="h-full flex overflow-hidden">
 
     <!-- LEFT COLUMN: BRAND HERO BANNER -->
-    <div class="hidden lg:flex lg:w-1/2 relative bg-neu-900 text-white flex-col justify-between p-12 overflow-hidden">
-        <!-- BACKGROUND CAMPUS IMAGE WITH OVERLAY -->
-        <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1600&auto=format&fit=crop&q=80');"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-neu-900 via-neu-800/90 to-neu-900/80"></div>
+    <div class="hidden lg:flex lg:w-1/2 relative bg-[#0a2540] text-white flex-col justify-between p-10 xl:p-14 overflow-hidden select-none">
+        <!-- BACKGROUND CAMPUS IMAGE (Iconic NEU Century Building) -->
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 hover:scale-105" 
+             style="background-image: url('https://cdn-media.sforum.vn/storage/app/media/ngocmy/truong-dai-hoc-kinh-te-quoc-dan-neu/truong-dai-hoc-kinh-te-quoc-dan-neu-6.jpg');">
+        </div>
+
+        <!-- ATMOSPHERIC NEU BRAND BLUE WASH (Matches Đăng nhập.png mockup) -->
+        <div class="absolute inset-0 bg-[#0F4C81]/45 mix-blend-multiply"></div>
+
+        <!-- TOP VIGNETTE GRADIENT (Makes Logo Pop) -->
+        <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/45 via-black/15 to-transparent"></div>
+
+        <!-- BOTTOM CONTRAST GRADIENT (Makes Typography Super Crisp & Readable) -->
+        <div class="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[#061b30] via-[#092644]/80 via-40% to-transparent"></div>
 
         <!-- TOP LOGO -->
-        <div class="relative z-10 flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-white text-neu-700 font-black text-base flex items-center justify-center shadow-lg">
+        <div class="relative z-10 flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-white text-neu-700 font-black text-sm flex items-center justify-center shadow-lg tracking-wider">
                 NEU
             </div>
             <div>
-                <div class="text-xl font-bold leading-tight tracking-wide">NEU Events</div>
-                <div class="text-xs uppercase font-medium text-slate-300 tracking-wider">ĐẠI HỌC KINH TẾ QUỐC DÂN</div>
+                <div class="text-lg font-bold leading-tight tracking-wide text-white drop-shadow-sm">NEU Events</div>
+                <div class="text-[10px] uppercase font-semibold text-blue-200 tracking-wider">ĐẠI HỌC KINH TẾ QUỐC DÂN</div>
             </div>
         </div>
 
-        <!-- MIDDLE SLOGAN & TITLE -->
-        <div class="relative z-10 space-y-6 max-w-lg my-auto">
-            <div class="flex items-center gap-2">
-                <span class="w-8 h-1 bg-rose-500 rounded-full inline-block"></span>
-                <span class="text-xs font-bold tracking-widest uppercase text-slate-200">KẾT NỐI • TRẢI NGHIỆM • TRƯỞNG THÀNH</span>
+        <!-- BOTTOM CONTENT: SLOGAN, TITLE, DESCRIPTION, STATS & FOOTER -->
+        <div class="relative z-10 space-y-6 max-w-lg mt-auto pt-16">
+            <div class="flex items-center gap-2.5">
+                <span class="w-6 h-0.5 bg-[#e11d48] rounded-full inline-block"></span>
+                <span class="text-[11px] font-bold tracking-widest uppercase text-white/95 drop-shadow-xs">KẾT NỐI • TRẢI NGHIỆM • TRƯỞNG THÀNH</span>
             </div>
-            <h1 class="text-4xl xl:text-5xl font-black leading-tight tracking-tight">
+            <h1 class="text-4xl xl:text-5xl font-black leading-[1.18] tracking-tight text-white drop-shadow-md">
                 Mỗi sự kiện,<br>một cơ hội mới.
             </h1>
-            <p class="text-base text-slate-200 leading-relaxed font-light">
+            <p class="text-sm xl:text-base text-blue-100/90 leading-relaxed font-normal drop-shadow-xs">
                 Khám phá hoạt động học thuật, kết nối doanh nghiệp và lan tỏa những giá trị tốt đẹp cùng cộng đồng NEU.
             </p>
 
             <!-- STATS ROW -->
-            <div class="grid grid-cols-3 gap-6 pt-6 border-t border-white/15">
+            <div class="grid grid-cols-3 gap-6 pt-6 border-t border-white/20">
                 <div>
-                    <div class="text-3xl font-extrabold text-white">120+</div>
-                    <div class="text-xs text-slate-300 mt-1">Sự kiện mỗi năm</div>
+                    <div class="text-3xl xl:text-4xl font-extrabold text-white tracking-tight drop-shadow-sm">120+</div>
+                    <div class="text-xs text-blue-200 mt-1 font-medium">Sự kiện mỗi năm</div>
                 </div>
                 <div>
-                    <div class="text-3xl font-extrabold text-white">15.000+</div>
-                    <div class="text-xs text-slate-300 mt-1">Lượt sinh viên tham gia</div>
+                    <div class="text-3xl xl:text-4xl font-extrabold text-white tracking-tight drop-shadow-sm">15.000+</div>
+                    <div class="text-xs text-blue-200 mt-1 font-medium">Lượt sinh viên tham gia</div>
                 </div>
                 <div>
-                    <div class="text-3xl font-extrabold text-white">50+</div>
-                    <div class="text-xs text-slate-300 mt-1">Đơn vị đồng hành</div>
+                    <div class="text-3xl xl:text-4xl font-extrabold text-white tracking-tight drop-shadow-sm">50+</div>
+                    <div class="text-xs text-blue-200 mt-1 font-medium">Đơn vị đồng hành</div>
                 </div>
             </div>
-        </div>
 
-        <!-- BOTTOM ADDRESS -->
-        <div class="relative z-10 text-xs text-slate-400">
-            Đại học Kinh tế Quốc dân • 207 Giải Phóng, Hà Nội
+            <!-- BOTTOM ADDRESS -->
+            <div class="text-xs text-blue-200/80 pt-2 font-normal drop-shadow-xs">
+                Đại học Kinh tế Quốc dân • 207 Giải Phóng, Hà Nội
+            </div>
         </div>
     </div>
 
